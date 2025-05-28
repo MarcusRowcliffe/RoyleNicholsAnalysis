@@ -20,4 +20,3 @@ pkg$data$deployments <- pkg$data$deployments %>%
          transect = map_chr(locNameElements, \(x) x[3]),
          zone = map_chr(locNameElements, \(x) x[4]),
          phase = map_chr(locNameElements, \(x) x[6]))
-View(pkg$data$deployments)
