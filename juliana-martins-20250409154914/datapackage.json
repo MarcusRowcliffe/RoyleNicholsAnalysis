@@ -1,0 +1,452 @@
+{
+  "profile": "https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/camtrap-dp-profile.json",
+  "name": "juliana-martins-20250409154914",
+  "id": "dfa223c4-8fed-47d0-a877-0e5590efa8ae",
+  "created": "2025-04-09T15:49:14Z",
+  "contributors": [
+    {
+      "title": "Agouti Admins",
+      "email": "agouti@wur.nl",
+      "role": "contributor"
+    },
+    {
+      "title": "Juliana Avila Martins",
+      "email": "j.martins23@imperial.ac.uk",
+      "role": "principalInvestigator"
+    }
+  ],
+  "image": "https://www.agouti.eu/uploads/project-images/01766dbd-4a63-44dc-a842-6dee4f765357.png",
+  "sources": [
+    {
+      "title": "Agouti",
+      "path": "https://www.agouti.eu",
+      "email": "agouti@wur.nl",
+      "version": "v4"
+    }
+  ],
+  "project": {
+    "id": "01766dbd-4a63-44dc-a842-6dee4f765357",
+    "title": "Juliana Martins",
+    "samplingDesign": "opportunistic",
+    "captureMethod": [
+      "activityDetection",
+      "timeLapse"
+    ],
+    "individualAnimals": false,
+    "observationLevel": [
+      "event"
+    ]
+  },
+  "spatial": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -60.52481,
+          -2.67237
+        ],
+        [
+          -60.02799,
+          -2.67237
+        ],
+        [
+          -60.02799,
+          -0.8636
+        ],
+        [
+          -60.52481,
+          -0.8636
+        ],
+        [
+          -60.52481,
+          -2.67237
+        ]
+      ]
+    ]
+  },
+  "temporal": {
+    "start": "2024-02-22",
+    "end": "2025-01-27"
+  },
+  "taxonomic": [
+    {
+      "scientificName": "Buteogallus urubitinga",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/NYW3",
+      "taxonRank": "species",
+      "order": "Accipitriformes",
+      "family": "Accipitridae",
+      "vernacularNames": {
+        "eng": "great black hawk",
+        "nld": "NULL"
+      }
+    },
+    {
+      "scientificName": "Cabassous unicinctus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/P43P",
+      "taxonRank": "species",
+      "order": "Cingulata",
+      "family": "Dasypodidae",
+      "vernacularNames": {
+        "eng": "southern naked-tailed armadillo",
+        "nld": "zuidelijk kaalstaartgordeldier"
+      }
+    },
+    {
+      "scientificName": "Caracara plancus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/QZS5",
+      "taxonRank": "species",
+      "order": "Falconiformes",
+      "family": "Falconidae",
+      "vernacularNames": {
+        "eng": "southern crested caracara",
+        "nld": "kuifcaracara"
+      }
+    },
+    {
+      "scientificName": "Chelonoidis denticulata",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/TVL8",
+      "taxonRank": "species",
+      "order": "Testudines",
+      "family": "Testudinidae",
+      "vernacularNames": {
+        "eng": "yellow-footed tortois",
+        "nld": "Braziliaanse reuzenschildpad"
+      }
+    },
+    {
+      "scientificName": "Crax fasciolata",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/6BC9B",
+      "taxonRank": "species",
+      "order": "Galliformes",
+      "family": "Cracidae",
+      "vernacularNames": {
+        "eng": "bare-faced curassow",
+        "nld": "NULL"
+      }
+    },
+    {
+      "scientificName": "Cuniculus paca",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/6BPX8",
+      "taxonRank": "species",
+      "order": "Rodentia",
+      "family": "Cuniculidae",
+      "vernacularNames": {
+        "eng": "lowland paca",
+        "nld": "paca"
+      }
+    },
+    {
+      "scientificName": "Dasyprocta",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4247",
+      "taxonRank": "genus",
+      "order": "Rodentia",
+      "family": "Dasyproctidae",
+      "vernacularNames": {
+        "eng": "agouti",
+        "nld": "agoetis"
+      }
+    },
+    {
+      "scientificName": "Dasyprocta punctata",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/349R6",
+      "taxonRank": "species",
+      "order": "Rodentia",
+      "family": "Dasyproctidae",
+      "vernacularNames": {
+        "eng": "Central American agouti",
+        "nld": "Midden-Amerikaanse agoeti"
+      }
+    },
+    {
+      "scientificName": "Dasypus novemcinctus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/349W8",
+      "taxonRank": "species",
+      "order": "Cingulata",
+      "family": "Dasypodidae",
+      "vernacularNames": {
+        "eng": "nine-banded armadillo",
+        "nld": "negenbandgordeldier"
+      }
+    },
+    {
+      "scientificName": "Didelphis marsupialis",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/35WKD",
+      "taxonRank": "species",
+      "order": "Didelphimorphia",
+      "family": "Didelphidae",
+      "vernacularNames": {
+        "eng": "common opossum",
+        "nld": "zuidelijke opossum"
+      }
+    },
+    {
+      "scientificName": "Eira barbara",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/38VYB",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Mustelidae",
+      "vernacularNames": {
+        "eng": "tayra",
+        "nld": "tayra"
+      }
+    },
+    {
+      "scientificName": "Leopardus pardalis",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/3T78D",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Felidae",
+      "vernacularNames": {
+        "eng": "ocelot",
+        "nld": "ocelot"
+      }
+    },
+    {
+      "scientificName": "Leopardus tigrinus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/6P8MM",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Felidae",
+      "vernacularNames": {
+        "eng": "oncilla",
+        "nld": "tijgerkat"
+      }
+    },
+    {
+      "scientificName": "Mazama",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/62ZG3",
+      "taxonRank": "genus",
+      "order": "Artiodactyla",
+      "family": "Cervidae",
+      "vernacularNames": {
+        "eng": "brocket deer",
+        "nld": "spiesherten"
+      }
+    },
+    {
+      "scientificName": "Microsciurus flaviventer",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/435RP",
+      "taxonRank": "species",
+      "order": "Rodentia",
+      "family": "Sciuridae",
+      "vernacularNames": {
+        "eng": "Amazon dwarf squirrel",
+        "nld": "Amazonedwergeekhoorn"
+      }
+    },
+    {
+      "scientificName": "Myrmecophaga tridactyla",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/45B2F",
+      "taxonRank": "species",
+      "order": "Pilosa",
+      "family": "Myrmecophagidae",
+      "vernacularNames": {
+        "eng": "giant anteater",
+        "nld": "reuzenmiereneter"
+      }
+    },
+    {
+      "scientificName": "Nasua nasua",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/45STB",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Procyonidae",
+      "vernacularNames": {
+        "eng": "South American coati",
+        "nld": "rode neusbeer"
+      }
+    },
+    {
+      "scientificName": "Panthera onca",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4CGXQ",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Felidae",
+      "vernacularNames": {
+        "eng": "jaguar",
+        "nld": "jaguar"
+      }
+    },
+    {
+      "scientificName": "Pecari tajacu",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/6TW4J",
+      "taxonRank": "species",
+      "order": "Artiodactyla",
+      "family": "Tayassuidae",
+      "vernacularNames": {
+        "eng": "collared peccary",
+        "nld": "halsbandpekari"
+      }
+    },
+    {
+      "scientificName": "Philander opossum",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4G4WJ",
+      "taxonRank": "species",
+      "order": "Didelphimorphia",
+      "family": "Didelphidae",
+      "vernacularNames": {
+        "eng": "gray four-eyed opossum",
+        "nld": "grijze vieroogbuidelrat"
+      }
+    },
+    {
+      "scientificName": "Priodontes maximus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4MF3Z",
+      "taxonRank": "species",
+      "order": "Cingulata",
+      "family": "Dasypodidae",
+      "vernacularNames": {
+        "eng": "giant armadillo",
+        "nld": "reuzengordeldier"
+      }
+    },
+    {
+      "scientificName": "Psophia crepitans",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4PLBR",
+      "taxonRank": "species",
+      "order": "Gruiformes",
+      "family": "Psophiidae",
+      "vernacularNames": {
+        "eng": "grey-winged trumpeter",
+        "nld": "trompetvogel"
+      }
+    },
+    {
+      "scientificName": "Puma concolor",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4QHKG",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Felidae",
+      "vernacularNames": {
+        "eng": "cougar",
+        "nld": "poema"
+      }
+    },
+    {
+      "scientificName": "Puma yagouaroundi",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4QHKJ",
+      "taxonRank": "species",
+      "order": "Carnivora",
+      "family": "Felidae",
+      "vernacularNames": {
+        "eng": "jaguarundi",
+        "nld": "jaguarundi"
+      }
+    },
+    {
+      "scientificName": "Saimiri sciureus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/4TZK2",
+      "taxonRank": "species",
+      "order": "Primates",
+      "family": "Cebidae",
+      "vernacularNames": {
+        "eng": "Guianan squirrel monkey",
+        "nld": "grijsgroen doodshoofdaapje"
+      }
+    },
+    {
+      "scientificName": "Sapajus apella ",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/6XJVY",
+      "taxonRank": "species",
+      "order": "Primates",
+      "family": "Cebidae",
+      "vernacularNames": {
+        "eng": "guianan brown capuchin"
+      }
+    },
+    {
+      "scientificName": "Sciuridae",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/83bc5307-462c-47d5-8140-966e42852231",
+      "taxonRank": "family",
+      "order": "Rodentia",
+      "family": "Sciuridae",
+      "vernacularNames": {
+        "nld": "NULL"
+      }
+    },
+    {
+      "scientificName": "spizaetus ornatus",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/3c75a046-fe27-4c19-a4e0-2be8ee0c8d28",
+      "taxonRank": "species",
+      "order": "accipitriformes",
+      "family": "accipitridae",
+      "vernacularNames": {
+        "eng": "ornate hawk-eagle",
+        "nld": "NULL"
+      }
+    },
+    {
+      "scientificName": "Tamandua tetradactyla",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/54M4Z",
+      "taxonRank": "species",
+      "order": "Pilosa",
+      "family": "Myrmecophagidae",
+      "vernacularNames": {
+        "eng": "southern tamandua",
+        "nld": "zuidelijke boommiereneter"
+      }
+    },
+    {
+      "scientificName": "Tapirus terrestris",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/54TGS",
+      "taxonRank": "species",
+      "order": "Perissodactyla",
+      "family": "Tapiridae",
+      "vernacularNames": {
+        "eng": "South American tapir",
+        "nld": "laaglandtapir"
+      }
+    },
+    {
+      "scientificName": "Tayassu pecari",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/55297",
+      "taxonRank": "species",
+      "order": "Artiodactyla",
+      "family": "Tayassuidae",
+      "vernacularNames": {
+        "eng": "white-lipped peccary",
+        "nld": "witlippekari"
+      }
+    },
+    {
+      "scientificName": "Tinamus major",
+      "taxonID": "https://www.checklistbank.org/dataset/COL2023/taxon/7CB5D",
+      "taxonRank": "species",
+      "order": "Tinamiformes",
+      "family": "Tinamidae",
+      "vernacularNames": {
+        "eng": "great tinamou",
+        "nld": "grote tinamoe"
+      }
+    }
+  ],
+  "resources": [
+    {
+      "name": "deployments",
+      "path": "deployments.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": "https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/deployments-table-schema.json"
+    },
+    {
+      "name": "media",
+      "path": "media.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": "https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/media-table-schema.json"
+    },
+    {
+      "name": "observations",
+      "path": "observations.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": "https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/observations-table-schema.json"
+    }
+  ]
+}
