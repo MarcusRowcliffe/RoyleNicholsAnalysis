@@ -227,9 +227,9 @@ make_detection_matrix <- function(pkg,
 
 # Result for Tapir
 
-result <- make_detection_matrix(pkg, species = "Tapirus terrestris")
+result_tapir <- make_detection_matrix(pkg, species = "Tapirus terrestris")
 
-matriz_tapir <- resultado$matrix[["Tapirus terrestris"]]  
+matriz_tapir <- result_tapir$matrix[["Tapirus terrestris"]]  
 
 # View table
 
@@ -241,11 +241,9 @@ View(matriz_tapir)
 #
 # Result for Puma
 
-result <- make_detection_matrix(pkg, species = "Puma concolor")
+result_puma <- make_detection_matrix(pkg, species = "Puma concolor")
 
-matriz_puma <- result$matrix[["Puma concolor"]]  
-
-# View table
+matriz_puma <- result_puma$matrix[["Puma concolor"]]  
 
 View(matriz_puma)  
 
@@ -259,38 +257,30 @@ result <- make_detection_matrix(pkg, species = "Dasyprocta punctata")
 
 matriz_dasyprocta <- result$matrix[["Dasyprocta punctata"]]  
 
-# View table
-
 View(matriz_dasyprocta)  
 
 
-
+# See how are the scientific names on the table
 unique(pkg$data$observations$scientificName)
+table(pkg$data$observations$scientificName)
 
-matriz_tapir <- result$matrix[["Tapirus terrestris"]]
-
+# Install unmarked package
 
 install.packages("unmarked")
 library(unmarked)
 
-# Verifique se a matriz está no formato correto (sites x occasions)
-dim(matriz_tapir)  # Deve ser [n_sites x n_occasions]
+# To verify if the matriz is in the correct format (sites x occasions)
+dim(matriz_tapir) 
 
-# Criar o objeto unmarked
-umf <- unmarkedFramePCount(y = matriz_tapir)
-modelo_rn <- pcount(~1 ~1, data = umf)
+# Create unmarked object
+umf_tapir <- unmarkedFramePCount(y = matriz_tapir)
+
+# Fit null N-mixture model (constant abundance and detection) (no covariates yet)
+modelo_rn <- pcount(~1 ~1, data = umf_tapir)
 summary(modelo_rn)
 
-# Create covariates table
-
-site_covs <- pkg$data$deployments %>%
-  dplyr::distinct(locationName, .keep_all = TRUE) %>%  # um por site
-  dplyr::select(locationName, distance, inside_reserve = zone) %>%  # escolha as covariáveis
-  dplyr::mutate(
-    distance = as.numeric(distance),                  # numérica
-    inside_reserve = as.factor(inside_reserve)        # categórica (fator)
-  ) %>%
-  tibble::column_to_rownames("locationName")
+# The average abundance is on the log scale (log(λ) = 0.355), so convert to natural scale:
+exp(0.355) # the result is individuals per site
 
 
 # Confirm parametres
@@ -310,14 +300,20 @@ names(pkg$data$deployments)
 library(dplyr)
 
 site_covs <- pkg$data$deployments %>%
-  distinct(locationName, .keep_all = TRUE) %>%  # Garante um por site
+  distinct(locationName, .keep_all = TRUE) %>%  
   select(
-    deploymentID = locationName,   # coluna 1: ID do site
-    distance,                # coluna 2: distância da estrada
-    transect,                # coluna 3: transecto
-    zone,                    # coluna 4: dentro/fora da TI
-    phase                    # coluna 5: campanha
+    deploymentID = locationName,   
+    distance,                
+    transect,                
+    zone,                    
+    phase                    
   )
+
+# Criar a coluna season corretamente como fator
+site_covs$season <- factor(
+  ifelse(site_covs$phase == "1", "Dry", "Beggining of rain"),
+  levels = c("Dry", "Beggining of rain")
+)
 
 View(site_covs)
 
@@ -325,75 +321,183 @@ View(site_covs)
 ## Até aqui está certo
 
 
-
-# Create again Tapir Matriz
-
-result <- make_detection_matrix(pkg, species = "Tapirus terrestris")
-matriz_tapir <- result$matrix[["Tapirus terrestris"]]
-View(matriz_tapir)
-
-
 # Create object at unmarked
 
 library(unmarked)
 
-umf <- unmarkedFramePCount(
+umf_tapir <- unmarkedFramePCount(
   y = matriz_tapir,
   siteCovs = site_covs
 )
 
 
-# Simple Model
+# Simple Model (Null model)
 
-modelo_simples <- pcount(~1 ~1, data = umf)
+modelo_simples <- pcount(~1 ~1, data = umf_tapir)
 summary(modelo_simples)
 
 
-# Include covariates
+# Include distance covariate
 
-modelo_rn <- pcount(~1 ~ distance + transect + zone + phase, data = umf)
-summary(modelo_rn)
+modelo_dist <- pcount(~1 ~ distance, data = umf_tapir)
+summary(modelo_dist)
 
 
-# Graph distance from road
+# Include zone covariate
+
+modelo_zone <- pcount(~1 ~ zone, data = umf_tapir)
+summary(modelo_zone)
+
+
+# Graph distance from road for tapir
 install.packages("ggplot2")
 library(ggplot2)
 
 
-# Correcting order of the factors
+# Correcting order of the factors (distance)
 
 site_covs$distance <- factor(site_covs$distance, levels = c("10m", "100m", "250m", "500m", "1000m"))
 
-# Model considering distances
 
-modelo_dist <- pcount(~1 ~ distance, data = umf)
-summary(modelo_dist)
-
-
-# Criar tabela com os níveis de distância
+# Create a new data frame with distance levels
 new_data <- data.frame(distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
                                          levels = c("10m", "100m", "250m", "500m", "1000m")))
 
 
-# Prever abundância estimada pelo modelo
+# Predict abundance estimates from the model
 pred <- predict(modelo_dist, type = "state", newdata = new_data)
 
-# Juntar dados para plotagem
+# Combine distance levels with prediction results
 plot_data <- cbind(new_data, pred)
 
-library(ggplot2)
+
+# Plot estimated abundance by distance
 
 ggplot(plot_data, aes(x = distance, y = Predicted)) +
   geom_point(size = 3) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.1) +
   labs(
-    title = "Abundância estimada de anta por distância da estrada",
-    x = "Distância da estrada (m)",
-    y = "Abundância estimada (λ)"
+    title = "Estimated Abundance of Tapirs at Different Distances from the Road",
+    x = "Distance from road (m)",
+    y = "Estimated Abundance (λ)"
   ) +
   theme_minimal()
 
 
+
+#### Plot graph per zone
+
+# Create a new data frame with zone levels
+new_data_zone <- data.frame(zone = factor(c("INPA", "TIWA"),
+                                          levels = c("INPA", "TIWA")))
+
+# Predict abundance from modelo_zone
+pred_zone <- predict(modelo_zone, type = "state", newdata = new_data_zone)
+
+# Combine with prediction results
+plot_data_zone <- cbind(new_data_zone, pred_zone)
+
+# Plot estimated abundance by zone
+ggplot(plot_data_zone, aes(x = zone, y = Predicted)) +
+  geom_point(size = 3, color = "sienna4") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(
+    title = "Estimated Abundance of Tapir by Zone",
+    x = "Zone",
+    y = "Estimated Abundance (λ)"
+  ) +
+  theme_minimal()
+
+modelo_zone <- pcount(~1 ~ zone, data = umf)
+summary(modelo_zone)
+
+
+
+
+####### Combine model distance + zone
+
+modelo_comb <- pcount(~1 ~ distance + zone, data = umf_tapir)
+summary(modelo_comb)
+
+# Put combined model in a graph
+new_data <- expand.grid(
+  distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                    levels = c("10m", "100m", "250m", "500m", "1000m")),
+  zone = factor(c("INPA", "TIWA"),
+                levels = c("INPA", "TIWA"))
+)
+
+pred_comb <- predict(modelo_comb, type = "state", newdata = new_data)
+plot_data_comb <- cbind(new_data, pred_comb)
+library(ggplot2)
+
+ggplot(plot_data_comb, aes(x = distance, y = Predicted, color = zone, group = zone)) +
+  geom_point(position = position_dodge(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), 
+                width = 0.2, position = position_dodge(width = 0.3)) +
+  labs(
+    title = "Estimated abundance by distance from road and zone",
+    x = "Distance from road (m)",
+    y = "Estimated abundance (λ)",
+    color = "Zone"
+  ) +
+  theme_minimal()
+
+
+
+#### Coeficients
+
+# Estimativas do modelo zone para a anta (log-scale)
+intercept_log <- 0.297  # INPA (referência)
+zone_effect_log <- 0.406  # Efeito de estar na TIWA
+
+# Converter para escala real (lambda: abundância esperada)
+lambda_inpa <- exp(intercept_log)
+lambda_tiwa <- exp(intercept_log + zone_effect_log)
+
+# Calcular a diferença percentual
+percent_diff <- (lambda_tiwa - lambda_inpa) / lambda_inpa * 100
+
+# Mostrar o resultado
+cat("Estimated abundance INPA:", round(lambda_inpa, 3), "\n")
+cat("Estimated abundance TIWA:", round(lambda_tiwa, 3), "\n")
+cat("Percentual difference between TIWA and INPA:", round(percent_diff, 1), "%\n")
+
+
+
+#### Include season as covariate
+
+modelo_season <- pcount(~1 ~ season, data = umf_tapir)
+summary(modelo_season)
+
+### Graph for season
+
+# Prever abundância para cada estação
+new_data <- data.frame(season = c("Dry", "Beggining of rain"))
+
+# Previsão com intervalo de confiança
+pred_season <- predict(modelo_season, type = "state", newdata = new_data)
+
+# Juntar previsões com os dados
+plot_data <- cbind(new_data, pred_season)
+
+# Carregar o pacote ggplot2
+library(ggplot2)
+
+ggplot(plot_data, aes(x = season, y = Predicted)) +
+  geom_point(size = 3, color = "darkblue") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(
+    title = "Estimated Abundance of Tapir by Season",
+    x = "Season",
+    y = "Estimated Abundance (λ)"
+  ) +
+  theme_minimal()
+
+
+
+
+########
 # Doing the same thing but for Dasyprocta punctata
 
 result_cotia <- make_detection_matrix(pkg, species = "Dasyprocta punctata")
@@ -443,74 +547,284 @@ ggplot(plot_data_cotia, aes(x = distance, y = Predicted)) +
   geom_point(size = 3, color = "darkgreen") +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.1) +
   labs(
-    title = "Abundância estimada de cotia por distância da estrada",
-    x = "Distância da estrada (m)",
-    y = "Abundância estimada (λ)"
+    title = "Estimated abundance of Agouti at different distances",
+    x = "Distance from road (m)",
+    y = "Estimated abundance (λ)"
   ) +
   theme_minimal()
 
-# Same thing for Tayassu pecari
-# Create detection matriz
+
+## Agouti per zone
+
+modelo_zone_cotia <- pcount(~1 ~ zone, data = umf_cotia)
+summary(modelo_zone_cotia)
+
+# Criar novo data.frame com os níveis da variável "zone"
+new_data_zone_cotia <- data.frame(zone = factor(c("INPA", "TIWA"),
+                                                levels = c("INPA", "TIWA")))
+
+# Prever abundância estimada com base no modelo
+pred_zone_cotia <- predict(modelo_zone_cotia, type = "state", newdata = new_data_zone_cotia)
+
+# Combinar os dados com as previsões
+plot_data_zone_cotia <- cbind(new_data_zone_cotia, pred_zone_cotia)
+
+# Plotar gráfico
+library(ggplot2)
+
+ggplot(plot_data_zone_cotia, aes(x = zone, y = Predicted)) +
+  geom_point(size = 3, color = "darkgreen") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(
+    title = "Estimated Abundance of Agouti (Dasyprocta punctata) by Zone",
+    x = "Zone",
+    y = "Estimated Abundance (λ)"
+  ) +
+  theme_minimal()
+
+
+####### Combine model distance + zone for Agouti
+
+modelo_comb_cotia <- pcount(~1 ~ distance + zone, data = umf_cotia)
+summary(modelo_comb_cotia)
+
+# Put combined model in a graph
+new_data_cotia <- expand.grid(
+  distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                    levels = c("10m", "100m", "250m", "500m", "1000m")),
+  zone = factor(c("INPA", "TIWA"),
+                levels = c("INPA", "TIWA"))
+)
+
+pred_comb_cotia <- predict(modelo_comb_cotia, type = "state", newdata = new_data_cotia)
+plot_data_comb_cotia <- cbind(new_data_cotia, pred_comb_cotia)
+library(ggplot2)
+
+ggplot(plot_data_comb_cotia, aes(x = distance, y = Predicted, color = zone, group = zone)) +
+  geom_point(position = position_dodge(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), 
+                width = 0.2, position = position_dodge(width = 0.3)) +
+  labs(
+    title = "Estimated abundance by distance from road and zone (Agouti)",
+    x = "Distance from road (m)",
+    y = "Estimated abundance (λ)",
+    color = "Zone"
+  ) +
+  theme_minimal()
+
+
+#### Coeficients
+
+# Estimativas do modelo zone para a cotia (log-scale)
+intercept_log <- -0.2753  # INPA (referência)
+zone_effect_log <- -0.0355  # Efeito de estar na TIWA
+
+# Converter para escala real (lambda: abundância esperada)
+lambda_inpa <- exp(intercept_log)
+lambda_tiwa <- exp(intercept_log + zone_effect_log)
+
+# Calcular a diferença percentual
+percent_diff <- (lambda_tiwa - lambda_inpa) / lambda_inpa * 100
+
+# Mostrar o resultado
+cat("Estimated abundance INPA:", round(lambda_inpa, 3), "\n")
+cat("Estimated abundance TIWA:", round(lambda_tiwa, 3), "\n")
+cat("Percentual difference between TIWA and INPA:", round(percent_diff, 1), "%\n")
+
+
+
+
+########
+# Doing the same thing but for queixada 
 
 result_tayassu <- make_detection_matrix(pkg, species = "Tayassu pecari")
 matriz_tayassu <- result_tayassu$matrix[["Tayassu pecari"]]
 View(matriz_tayassu)
 
-# 1. Criar a matriz de detecção
-result_queixada <- make_detection_matrix(pkg, species = "Tayassu pecari")
-matriz_queixada <- result_queixada$matrix[["Tayassu pecari"]]
-
-# 2. Alinhar os sites da matriz com os da tabela de covariáveis
-site_covs_queixada <- site_covs[rownames(matriz_queixada), ]
-
-# 3. Criar o objeto unmarked
-umf_queixada <- unmarkedFramePCount(
-  y = matriz_queixada,
-  siteCovs = site_covs_queixada
-)
-
-# 4. Garantir que distance esteja como fator na ordem certa
-site_covs_queixada$distance <- factor(site_covs_queixada$distance,
-                                      levels = c("10m", "100m", "250m", "500m", "1000m"))
-
-# 5. Rodar o modelo considerando a distância
-modelo_dist_queixada <- pcount(~1 ~ distance, data = umf_queixada, K = 20)
-summary(modelo_dist_queixada)
-
-# 6. Prever abundância estimada para cada distância
-new_data <- data.frame(distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
-                                         levels = c("10m", "100m", "250m", "500m", "1000m")))
-
-pred_queixada <- predict(modelo_dist_queixada, type = "state", newdata = new_data)
-plot_data_queixada <- cbind(new_data, pred_queixada)
-
-# 7. Plotar o gráfico
-library(ggplot2)
-
-ggplot(plot_data_queixada, aes(x = distance, y = Predicted)) +
-  geom_point(size = 3, color = "firebrick") +
-  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.1) +
-  labs(
-    title = "Abundância estimada de queixada (Tayassu pecari) por distância da estrada",
-    x = "Distância da estrada (m)",
-    y = "Abundância estimada (λ)"
-  ) +
-  theme_minimal()
-
-# Align with covariates site table
-
-site_covs_tayassu <- site_covs[rownames(matriz_tayassu), ]
-
 # Create object at unmarked
+
+library(unmarked)
 
 umf_tayassu <- unmarkedFramePCount(
   y = matriz_tayassu,
-  siteCovs = site_covs_tayassu
+  siteCovs = site_covs
 )
 
-# Generate model with distance
+# Correcting order of the factors
 
-modelo_dist_tayassu <- pcount(~1 ~ distance, data = umf_tayassu, K = 20)
+site_covs$distance <- factor(site_covs$distance, levels = c("10m", "100m", "250m", "500m", "1000m"))
+
+# Model considering distances
+
+modelo_dist_tayassu <- pcount(~1 ~ distance, data = umf_tayassu)
 summary(modelo_dist_tayassu)
 
-sum(matriz_tayassu, na.rm = TRUE)
+
+# Criar tabela com os níveis de distância
+new_data <- data.frame(distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                                         levels = c("10m", "100m", "250m", "500m", "1000m")))
+
+
+# Prever abundância estimada pelo modelo
+pred <- predict(modelo_dist, type = "state", newdata = new_data)
+
+# Juntar dados para plotagem
+plot_data <- cbind(new_data, pred)
+
+library(ggplot2)
+
+new_data <- data.frame(distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                                         levels = c("10m", "100m", "250m", "500m", "1000m")))
+
+pred_tayassu <- predict(modelo_dist_tayassu, type = "state", newdata = new_data)
+
+plot_data_tayassu <- cbind(new_data, pred_tayassu)
+
+ggplot(plot_data_tayassu, aes(x = distance, y = Predicted)) +
+  geom_point(size = 3, color = "darkgreen") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.1) +
+  labs(
+    title = "Estimated abundance of Tayassu at different distances",
+    x = "Distance from road (m)",
+    y = "Estimated abundance (λ)"
+  ) +
+  theme_minimal()
+
+
+## Tayassu per zone
+
+modelo_zone_tayassu <- pcount(~1 ~ zone, data = umf_tayassu)
+summary(modelo_zone_tayassu)
+
+# Criar novo data.frame com os níveis da variável "zone"
+new_data_zone_tayassu <- data.frame(zone = factor(c("INPA", "TIWA"),
+                                                levels = c("INPA", "TIWA")))
+
+# Prever abundância estimada com base no modelo
+pred_zone_tayassu <- predict(modelo_zone_tayassu, type = "state", newdata = new_data_zone_tayassu)
+
+# Combinar os dados com as previsões
+plot_data_zone_tayassu <- cbind(new_data_zone_tayassu, pred_zone_tayassu)
+
+# Plotar gráfico
+library(ggplot2)
+
+ggplot(plot_data_zone_tayassu, aes(x = zone, y = Predicted)) +
+  geom_point(size = 3, color = "darkgreen") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(
+    title = "Estimated Abundance of Tayassu by Zone",
+    x = "Zone",
+    y = "Estimated Abundance (λ)"
+  ) +
+  theme_minimal()
+
+
+####### Combine model distance + zone for Tayassu
+
+modelo_comb_tayassu <- pcount(~1 ~ distance + zone, data = umf_tayassu)
+summary(modelo_comb_tayassu)
+
+# Put combined model in a graph
+new_data_tayassu <- expand.grid(
+  distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                    levels = c("10m", "100m", "250m", "500m", "1000m")),
+  zone = factor(c("INPA", "TIWA"),
+                levels = c("INPA", "TIWA"))
+)
+
+pred_comb_tayassu <- predict(modelo_comb_tayassu, type = "state", newdata = new_data_tayassu)
+plot_data_comb_tayassu <- cbind(new_data_tayassu, pred_comb_tayassu)
+library(ggplot2)
+
+ggplot(plot_data_comb_tayassu, aes(x = distance, y = Predicted, color = zone, group = zone)) +
+  geom_point(position = position_dodge(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), 
+                width = 0.2, position = position_dodge(width = 0.3)) +
+  labs(
+    title = "Estimated abundance by distance from road and zone (Tayassu)",
+    x = "Distance from road (m)",
+    y = "Estimated abundance (λ)",
+    color = "Zone"
+  ) +
+  theme_minimal()
+
+
+#### Coeficients
+
+# Estimativas do modelo zone para a tayassu (log-scale)
+intercept_log <- -1.602  # INPA (referência)
+zone_effect_log <- 0.465  # Efeito de estar na TIWA
+
+# Converter para escala real (lambda: abundância esperada)
+lambda_inpa <- exp(intercept_log)
+lambda_tiwa <- exp(intercept_log + zone_effect_log)
+
+# Calcular a diferença percentual
+percent_diff <- (lambda_tiwa - lambda_inpa) / lambda_inpa * 100
+
+# Mostrar o resultado
+cat("Estimated abundance INPA:", round(lambda_inpa, 3), "\n")
+cat("Estimated abundance TIWA:", round(lambda_tiwa, 3), "\n")
+cat("Percentual difference between TIWA and INPA:", round(percent_diff, 1), "%\n")
+
+
+
+############### Bayesian model
+
+install.packages("ubms")
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+cmdstanr::install_cmdstan()  # roda só uma vez
+
+library(ubms)
+library(cmdstanr)
+library(ggplot2)
+
+# Correct order of factors in covariantes site
+site_covs$distance <- factor(site_covs$distance,
+                             levels = c("10m", "100m", "250m", "500m", "1000m"))
+
+# Create unmarked object
+umf_cotia <- unmarkedFramePCount(
+  y = matriz_cotia,
+  siteCovs = site_covs
+)
+
+# Bayesian model (stan)
+modelo_bayes_cotia <- stan_pcount(~1 ~ distance,
+                                  data = umf_cotia,
+                                  chains = 4,
+                                  iter = 2000,
+                                  seed = 123)
+
+# Sumary 
+summary(modelo_bayes_cotia, submodel = "state")
+
+# Create new table with distances
+new_data <- data.frame(distance = factor(c("10m", "100m", "250m", "500m", "1000m"),
+                                         levels = c("10m", "100m", "250m", "500m", "1000m")))
+
+# Predict abundance
+pred_cotia_bayes <- predict(modelo_bayes_cotia, submodel = "state", newdata = new_data)
+
+# Verify columns names
+names(pred_cotia_bayes)
+
+# Plot data
+plot_data_cotia_bayes <- cbind(new_data, pred_cotia_bayes)
+
+# Making the graph
+library(ggplot2)
+ggplot(plot_data_cotia_bayes, aes(x = distance, y = Predicted)) +
+  geom_point(size = 3, color = "darkgreen") +
+  geom_errorbar(aes(ymin = `2.5%`, ymax = `97.5%`), width = 0.1) +
+  labs(
+    title = "Estimated Abundance of Agouti (Bayesian model)",
+    x = "Distance from road (m)",
+    y = "Estimated Abundance (λ)"
+  ) +
+  theme_minimal()
+
+
+View(site_covs)
+
